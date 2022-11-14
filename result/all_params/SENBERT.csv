@@ -1,0 +1,2 @@
+,SVM,RF
+0,"{'kernel': 'sigmoid', 'C': 28.31200733390915}","{'n_estimators': 77, 'max_depth': 46, 'min_samples_split': 3, 'min_samples_leaf': 2, 'criterion': 'entropy', 'max_features': 11}"

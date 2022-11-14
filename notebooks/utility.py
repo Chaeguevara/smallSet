@@ -31,7 +31,7 @@ def adversarial_validation(X, Y, n_splits = 10):
         x_train, y_train = sparse_merge[train_idx], y[train_idx]
         x_test, y_test = sparse_merge[test_idx], y[test_idx]
         
-        log_reg = SGDClassifier(loss = 'log')
+        log_reg = SGDClassifier(loss = 'lo_loss')
         log_reg.fit(x_train, y_train)
         y_test_prob = log_reg.predict_proba(x_test)[:,1]
         lr_auc = np.append(lr_auc, roc_auc_score(y_test, y_test_prob))
@@ -58,22 +58,27 @@ def calc_f1(p_and_r):
 # Print the F1, Precision, Recall, ROC-AUC, and Accuracy Metrics 
 # Since we are optimizing for F1 score - we will first calculate precision and recall and 
 # then find the probability threshold value that gives us the best F1 score
+def print_model_metrics(y_test, y_test_prob,y_pred,lbl_to_idx, idx_to_lbl,label_list, confusion = False, verbose = False, return_metrics = False):
 
-def print_model_metrics(y_test, y_test_prob, confusion = False, verbose = True, return_metrics = False):
 
-    precision, recall, threshold = precision_recall_curve(y_test, y_test_prob, pos_label = 1)
+    print(roc_auc_score(y_test,y_test_prob,labels = label_list,multi_class='ovr',average="weighted"))
+    print(accuracy_score(y_test,y_pred))
+    pass_=False
+    if pass_:
+        label_=idx_to_lbl[idx] 
+        precision, recall, threshold = precision_recall_curve(y_test, y_test_prob, pos_label = label_)
     
-    #Find the threshold value that gives the best F1 Score
-    best_f1_index =np.argmax([calc_f1(p_r) for p_r in zip(precision, recall)])
-    best_threshold, best_precision, best_recall = threshold[best_f1_index], precision[best_f1_index], recall[best_f1_index]
+        #Find the threshold value that gives the best F1 Score
+        best_f1_index =np.argmax([calc_f1(p_r) for p_r in zip(precision, recall)])
+        best_threshold, best_precision, best_recall = threshold[best_f1_index], precision[best_f1_index], recall[best_f1_index]
     
-    # Calulcate predictions based on the threshold value
-    y_test_pred = np.where(y_test_prob > best_threshold, 1, 0)
+        # Calulcate predictions based on the threshold value
+        y_test_pred = np.where(y_test_prob > best_threshold, label_, 0)
     
-    # Calculate all metrics
-    f1 = f1_score(y_test, y_test_pred, pos_label = 1, average = 'binary')
-    roc_auc = roc_auc_score(y_test, y_test_prob)
-    acc = accuracy_score(y_test, y_test_pred)
+        # Calculate all metrics
+        f1 = f1_score(y_test, y_test_pred, pos_label = label_, average = 'weighted')
+        roc_auc = roc_auc_score(y_test, y_test_prob)
+        acc = accuracy_score(y_test, y_test_pred)
     
     
     if confusion:
@@ -92,20 +97,17 @@ def print_model_metrics(y_test, y_test_prob, confusion = False, verbose = True, 
     
     if return_metrics:
         return np.array([f1, best_precision, best_recall, roc_auc, acc])
-    
+
 
 
 # Run log reg 10 times and average the result to reduce predction variance
-def run_log_reg(train_features, test_features, y_train, y_test,  alpha = 1e-4, confusion = False, return_f1 = False, verbose = True):
-    metrics = np.zeros(5)
-    for _ in range(10):
-        log_reg = SGDClassifier(loss = 'log', alpha = alpha, n_jobs = -1, penalty = 'l2')
-        log_reg.fit(train_features, y_train)
-        y_test_prob = log_reg.predict_proba(test_features)[:,1]
-        metrics += print_model_metrics(y_test, y_test_prob, confusion = confusion, verbose = False, return_metrics = True)
-    metrics /=10
+def run_log_reg(train_features, test_features, y_train, y_test, lbl_to_idx, idx_to_lbl,label_list, alpha = 1e-4, confusion = False, return_f1 = False, verbose = False,):
+    log_reg = SGDClassifier(loss = 'log_loss', alpha = alpha, n_jobs = -1, penalty = 'l2', random_state=1)
+    log_reg.fit(train_features, y_train)
+    y_test_prob = log_reg.predict_proba(test_features)
+    y_pred = log_reg.predict(test_features)
+    print(y_test_prob.shape)
+    print_model_metrics(y_test, y_test_prob,y_pred,lbl_to_idx=lbl_to_idx,idx_to_lbl=idx_to_lbl,label_list=label_list, confusion = confusion, verbose = False, return_metrics = False)
     if verbose:
         print('F1: {:.3f} | Pr: {:.3f} | Re: {:.3f} | AUC: {:.3f} | Accuracy: {:.3f} \n'.format(*metrics))
-    if return_f1:
-        return metrics[0]
     return log_reg

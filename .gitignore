@@ -1,1 +1,5 @@
 vectors/*
+notebooks/Glove/*
+notebooks/fastText/*
+notebooks/org/*
+notebooks/encoder/*

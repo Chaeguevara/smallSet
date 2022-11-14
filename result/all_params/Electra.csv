@@ -1,0 +1,2 @@
+,SVM,RF
+0,"{'kernel': 'poly', 'C': 35.65903070724176}","{'n_estimators': 76, 'max_depth': 42, 'min_samples_split': 5, 'min_samples_leaf': 1, 'criterion': 'entropy', 'max_features': 12}"

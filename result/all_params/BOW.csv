@@ -1,0 +1,2 @@
+,Naive bayes,SVM,RF
+0,{'alpha': 0.03328114491741915},"{'kernel': 'sigmoid', 'C': 25.385386246172523}","{'n_estimators': 65, 'max_depth': 33, 'min_samples_split': 3, 'min_samples_leaf': 1, 'criterion': 'log_loss', 'max_features': 1}"

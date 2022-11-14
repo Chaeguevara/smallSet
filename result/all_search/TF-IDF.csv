@@ -1,0 +1,5 @@
+,Naïve bayes,K-Nearest Neighbors(KNN),SVM,RF
+0,{'alpha': 0.0451338047960445},,,
+1,,{'n_neighbors': 1},,
+2,,,"{'kernel': 'sigmoid', 'C': 29.5414498867173}",
+3,,,,"{'n_estimators': 33, 'max_depth': 38, 'min_samples_split': 4, 'min_samples_leaf': 1, 'criterion': 'entropy', 'max_features': 1}"
